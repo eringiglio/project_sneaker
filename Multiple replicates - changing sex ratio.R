@@ -1,0 +1,115 @@
+#Set initial parameter values - population size and allele frequency
+POPULATION = 1000
+FREQ_T = 0.5
+FREQ_S = 1-FREQ_T
+
+#Initial sex ratio
+SEX_RATIO_F = 0.5
+SEX_RATIO_M = 1-SEX_RATIO_F
+
+#Collect runs
+MODEL_OUTPUT_S<-data.frame(NULL)
+MODEL_OUTPUT_T<-data.frame(NULL)
+
+#Number of generations for simulation to run
+#Also set number of replicates
+#Useful for when we go to nested for loops or similar for multiple runs, to get summaries
+REPLICATES<-3
+GENERATIONS<-1000
+
+for (j in 1:REPLICATES){
+
+  #Get number of individuals for each sex and genotype
+  #Had to add t() here as for some idiotic reason it's giving me a column, rather than a row
+  #Might be specific to my lab desktop, but if this runs weird on another computer it will give lots of errors
+  #To fix, just remove the outer parenthesis and the t
+  #COlumn output makes data storage look weird
+  NUMBERS_FEMALE<-t(rmultinom(1,POPULATION*SEX_RATIO_F,c(FREQ_T^2,FREQ_T*2*FREQ_S,FREQ_S^2)))
+  NUMBERS_MALE<-t(rmultinom(1,POPULATION*SEX_RATIO_M,c(FREQ_T^2,FREQ_T*FREQ_S*2,FREQ_S^2)))
+  
+  DATA_MALE<-NULL
+  DATA_FEMALE<-NULL
+  
+  #Add initial values to data output for plotting
+  DATA_MALE<-rbind(DATA_MALE,NUMBERS_MALE)
+  DATA_FEMALE<-rbind(DATA_FEMALE,NUMBERS_FEMALE)
+  #Collect allele frequency data
+  DATA_S<-FREQ_S
+  DATA_T<-FREQ_T
+  
+  #Collect total population data
+  DATA_POPULATION<-POPULATION
+  
+  #Diagnostic variable
+  CHECK_FREQS<-NULL
+  
+  for (i in 1:GENERATIONS){
+    
+    #New generation
+    #Probabilities for different genotypes of offpring
+    #HS - homozygote sneaker, HT - homozygote territorial, HET - heterozygote
+    #Notation: e.g. HSTOHS - probability of HS female having HS offspring
+    SS_TO_SS<-(NUMBERS_MALE[3]/sum(NUMBERS_MALE))+(0.5*NUMBERS_MALE[2]/sum(NUMBERS_MALE))
+    SS_TO_ST<-(NUMBERS_MALE[1]/sum(NUMBERS_MALE))+(0.5*NUMBERS_MALE[2]/sum(NUMBERS_MALE))
+    TT_TO_TT<-(NUMBERS_MALE[1]/sum(NUMBERS_MALE))+(0.5*NUMBERS_MALE[2]/sum(NUMBERS_MALE))
+    TT_TO_ST<-(NUMBERS_MALE[3]/sum(NUMBERS_MALE))+(0.5*NUMBERS_MALE[2]/sum(NUMBERS_MALE))
+    ST_TO_TT<-((0.5*(NUMBERS_MALE[1]/sum(NUMBERS_MALE)))+(0.25*(NUMBERS_MALE[2]/sum(NUMBERS_MALE))))
+    ST_TO_SS<-((0.5*(NUMBERS_MALE[3]/sum(NUMBERS_MALE)))+(0.25*(NUMBERS_MALE[2]/sum(NUMBERS_MALE))))
+    ST_TO_ST<-(1-ST_TO_TT-ST_TO_SS)
+    
+    #Now caclculating offspring numbers from females of each genotype...
+    OFFSPRING_OF_SS<-rmultinom(1,NUMBERS_FEMALE[3]*2,c(SS_TO_SS,SS_TO_ST))
+    OFFSPRING_OF_TT<-rmultinom(1,NUMBERS_FEMALE[1]*2,c(TT_TO_ST,TT_TO_TT))
+    OFFSPRING_OF_ST<-rmultinom(1,NUMBERS_FEMALE[2]*2,c(ST_TO_TT,ST_TO_ST,ST_TO_SS))
+    
+    #For next generation, let's find out how many offspring of each genotype...
+    POPULATION<-sum(OFFSPRING_OF_TT,OFFSPRING_OF_ST,OFFSPRING_OF_SS)
+    TOTAL_SS<-sum(OFFSPRING_OF_SS[1],OFFSPRING_OF_ST[3])
+    TOTAL_ST<-sum(OFFSPRING_OF_SS[2],OFFSPRING_OF_ST[2],OFFSPRING_OF_TT[1])
+    TOTAL_TT<-sum(OFFSPRING_OF_ST[1],OFFSPRING_OF_TT[2])
+    FREQ_T<-((2*TOTAL_TT) + TOTAL_ST)/(POPULATION*2)
+    FREQ_S<-(2*(TOTAL_SS) + TOTAL_ST)/(POPULATION*2)
+    
+    #Stochastic sex ratio - draw from a beta distribution
+    #Parameters are 50/50 - this is completely arbitrary and we can play with it
+    ALPHA<-50
+    BETA<-50
+    SEX_RATIO_F<-rbeta(1, ALPHA,BETA)
+    SEX_RATIO_M<-1-SEX_RATIO_F
+  
+    #Calculating our numbers of males and females for the next gen...
+    NUMBERS_FEMALE<-c(ceiling(SEX_RATIO_F*TOTAL_TT),ceiling(SEX_RATIO_F*TOTAL_ST),ceiling(SEX_RATIO_F*TOTAL_SS))
+    NUMBERS_MALE<-c(floor(SEX_RATIO_M*TOTAL_TT),floor(SEX_RATIO_M*TOTAL_ST),floor(SEX_RATIO_M*TOTAL_SS))
+    DATA_MALE<-rbind(DATA_MALE,NUMBERS_MALE)
+    DATA_FEMALE<-rbind(DATA_FEMALE,NUMBERS_FEMALE)
+    DATA_POPULATION<-c(DATA_POPULATION,POPULATION)
+    DATA_S<-c(DATA_S,FREQ_S)
+    DATA_T<-c(DATA_T,FREQ_T)
+    CHECK_FREQS[i]<-(FREQ_S+FREQ_T)
+  }
+  
+  #Get total number of males and females at each step
+  TOTAL_NUMBER_OF_FEMALES<-NULL
+  TOTAL_NUMBER_OF_MALES<-NULL
+  
+  for(i in 1:GENERATIONS+1){
+    TOTAL_NUMBER_OF_FEMALES[i]<-sum(DATA_FEMALE[i,])
+    TOTAL_NUMBER_OF_MALES[i]<-sum(DATA_MALE[i,])
+  }
+  
+  sum(CHECK_FREQS)==GENERATIONS
+  
+  #Get output for each run
+  MODEL_OUTPUT_S<-rbind(MODEL_OUTPUT_S,DATA_S)
+  MODEL_OUTPUT_T<-rbind(MODEL_OUTPUT_T,DATA_T)
+}  
+  #X<-seq(GENERATIONS+1)
+  #plot(cbind(X,DATA_T),ylim=c(0,1),col='red')
+  #points(cbind(X,DATA_S))
+  #plot(cbind(X,DATA_POPULATION))
+  #Marks initial population
+  #abline(h=1000)
+  #points(cbind(X,TOTAL_NUMBER_OF_MALES),col='red')
+  #points(cbind(X,TOTAL_NUMBER_OF_FEMALES),col='darkgoldenrod')
+  #Diagnostic, should be equal to generations
+
