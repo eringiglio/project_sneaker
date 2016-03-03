@@ -1,12 +1,3 @@
-#Set initial parameter values - population size and allele frequency
-POPULATION = 1000
-FREQ_T = 0.5
-FREQ_S = 1-FREQ_T
-
-#Initial sex ratio
-SEX_RATIO_F = 0.5
-SEX_RATIO_M = 1-SEX_RATIO_F
-
 #Collect runs
 MODEL_OUTPUT_S<-data.frame(NULL)
 MODEL_OUTPUT_T<-data.frame(NULL)
@@ -19,6 +10,14 @@ GENERATIONS<-1000
 
 for (j in 1:REPLICATES){
 
+  #Set initial parameter values - population size and allele frequency
+  POPULATION = 1000
+  FREQ_T = 0.5
+  FREQ_S = 1-FREQ_T
+  
+  #Initial sex ratio
+  SEX_RATIO_F = 0.5
+  SEX_RATIO_M = 1-SEX_RATIO_F
   #Get number of individuals for each sex and genotype
   #Had to add t() here as for some idiotic reason it's giving me a column, rather than a row
   #Might be specific to my lab desktop, but if this runs weird on another computer it will give lots of errors
@@ -103,7 +102,7 @@ for (j in 1:REPLICATES){
   MODEL_OUTPUT_S<-rbind(MODEL_OUTPUT_S,DATA_S)
   MODEL_OUTPUT_T<-rbind(MODEL_OUTPUT_T,DATA_T)
 }  
-  #X<-seq(GENERATIONS+1)
+  X<-seq(GENERATIONS+1)
   #plot(cbind(X,DATA_T),ylim=c(0,1),col='red')
   #points(cbind(X,DATA_S))
   #plot(cbind(X,DATA_POPULATION))
