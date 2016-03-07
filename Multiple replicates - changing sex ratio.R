@@ -6,7 +6,7 @@ MODEL_OUTPUT_T<-data.frame(NULL)
 #Also set number of replicates
 #Useful for when we go to nested for loops or similar for multiple runs, to get summaries
 REPLICATES<-3
-GENERATIONS<-1000
+GENERATIONS<-100
 
 for (j in 1:REPLICATES){
 
@@ -24,7 +24,7 @@ for (j in 1:REPLICATES){
   #To fix, just remove the outer parenthesis and the t
   #COlumn output makes data storage look weird
   NUMBERS_FEMALE<-t(rmultinom(1,POPULATION*SEX_RATIO_F,c(FREQ_T^2,FREQ_T*2*FREQ_S,FREQ_S^2)))
-  NUMBERS_MALE<-t(rmultinom(1,POPULATION*SEX_RATIO_M,c(FREQ_T^2,FREQ_T*FREQ_S*2,FREQ_S^2)))
+  NUMBERS_MALE<-t(rmultinom(1,POPULATION*SEX_RATIO_M,c(FREQ_T^2,FREQ_T*2*FREQ_S,FREQ_S^2)))
   
   DATA_MALE<-NULL
   DATA_FEMALE<-NULL
@@ -47,13 +47,13 @@ for (j in 1:REPLICATES){
     #New generation
     #Probabilities for different genotypes of offpring
     #HS - homozygote sneaker, HT - homozygote territorial, HET - heterozygote
-    #Notation: e.g. HSTOHS - probability of HS female having HS offspring
-    SS_TO_SS<-(NUMBERS_MALE[3]/sum(NUMBERS_MALE))+(0.5*NUMBERS_MALE[2]/sum(NUMBERS_MALE))
-    SS_TO_ST<-(NUMBERS_MALE[1]/sum(NUMBERS_MALE))+(0.5*NUMBERS_MALE[2]/sum(NUMBERS_MALE))
-    TT_TO_TT<-(NUMBERS_MALE[1]/sum(NUMBERS_MALE))+(0.5*NUMBERS_MALE[2]/sum(NUMBERS_MALE))
-    TT_TO_ST<-(NUMBERS_MALE[3]/sum(NUMBERS_MALE))+(0.5*NUMBERS_MALE[2]/sum(NUMBERS_MALE))
-    ST_TO_TT<-((0.5*(NUMBERS_MALE[1]/sum(NUMBERS_MALE)))+(0.25*(NUMBERS_MALE[2]/sum(NUMBERS_MALE))))
-    ST_TO_SS<-((0.5*(NUMBERS_MALE[3]/sum(NUMBERS_MALE)))+(0.25*(NUMBERS_MALE[2]/sum(NUMBERS_MALE))))
+    #Notation: e.g. HS_TO_HS - probability of HS male having HS offspring
+    SS_TO_SS<-(NUMBERS_FEMALE[3]/sum(NUMBERS_FEMALE))+(0.5*NUMBERS_FEMALE[2]/sum(NUMBERS_FEMALE))
+    SS_TO_ST<-(NUMBERS_FEMALE[1]/sum(NUMBERS_FEMALE))+(0.5*NUMBERS_FEMALE[2]/sum(NUMBERS_FEMALE))
+    TT_TO_TT<-(NUMBERS_FEMALE[1]/sum(NUMBERS_FEMALE))+(0.5*NUMBERS_FEMALE[2]/sum(NUMBERS_FEMALE))
+    TT_TO_ST<-(NUMBERS_FEMALE[3]/sum(NUMBERS_FEMALE))+(0.5*NUMBERS_FEMALE[2]/sum(NUMBERS_FEMALE))
+    ST_TO_TT<-((0.5*(NUMBERS_FEMALE[1]/sum(NUMBERS_FEMALE)))+(0.25*(NUMBERS_FEMALE[2]/sum(NUMBERS_FEMALE))))
+    ST_TO_SS<-((0.5*(NUMBERS_FEMALE[3]/sum(NUMBERS_FEMALE)))+(0.25*(NUMBERS_FEMALE[2]/sum(NUMBERS_FEMALE))))
     ST_TO_ST<-(1-ST_TO_TT-ST_TO_SS)
     
     #Now caclculating offspring numbers from females of each genotype...
@@ -73,8 +73,8 @@ for (j in 1:REPLICATES){
     #Parameters are 50/50 - this is completely arbitrary and we can play with it
     ALPHA<-50
     BETA<-50
-    SEX_RATIO_F<-rbeta(1, ALPHA,BETA)
-    SEX_RATIO_M<-1-SEX_RATIO_F
+    SEX_RATIO_M<-rbeta(1, ALPHA,BETA)
+    SEX_RATIO_F<-1-SEX_RATIO_M
   
     #Calculating our numbers of males and females for the next gen...
     NUMBERS_FEMALE<-c(ceiling(SEX_RATIO_F*TOTAL_TT),ceiling(SEX_RATIO_F*TOTAL_ST),ceiling(SEX_RATIO_F*TOTAL_SS))
@@ -91,9 +91,9 @@ for (j in 1:REPLICATES){
   TOTAL_NUMBER_OF_FEMALES<-NULL
   TOTAL_NUMBER_OF_MALES<-NULL
   
-  for(i in 1:GENERATIONS+1){
-    TOTAL_NUMBER_OF_FEMALES[i]<-sum(DATA_FEMALE[i,])
-    TOTAL_NUMBER_OF_MALES[i]<-sum(DATA_MALE[i,])
+  for(k in 1:GENERATIONS+1){
+    TOTAL_NUMBER_OF_FEMALES[k]<-sum(DATA_FEMALE[k,])
+    TOTAL_NUMBER_OF_MALES[k]<-sum(DATA_MALE[k,])
   }
   
   sum(CHECK_FREQS)==GENERATIONS
@@ -103,12 +103,12 @@ for (j in 1:REPLICATES){
   MODEL_OUTPUT_T<-rbind(MODEL_OUTPUT_T,DATA_T)
 }  
   X<-seq(GENERATIONS+1)
-  #plot(cbind(X,DATA_T),ylim=c(0,1),col='red')
-  #points(cbind(X,DATA_S))
-  #plot(cbind(X,DATA_POPULATION))
+  plot(cbind(X,DATA_T),ylim=c(0,1),col='red')
+  points(cbind(X,DATA_S))
+  plot(cbind(X,DATA_POPULATION))
   #Marks initial population
-  #abline(h=1000)
-  #points(cbind(X,TOTAL_NUMBER_OF_MALES),col='red')
-  #points(cbind(X,TOTAL_NUMBER_OF_FEMALES),col='darkgoldenrod')
+  abline(h=1000)
+  points(cbind(X,TOTAL_NUMBER_OF_MALES),col='red')
+  points(cbind(X,TOTAL_NUMBER_OF_FEMALES),col='darkgoldenrod')
   #Diagnostic, should be equal to generations
 
