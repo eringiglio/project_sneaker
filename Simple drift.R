@@ -30,7 +30,7 @@ for (i in 1:1000){
   ST_TO_SS<-((0.5*(NUMBERS_MALE[3]/sum(NUMBERS_MALE)))+(0.25*(NUMBERS_MALE[2]/sum(NUMBERS_MALE))))
   ST_TO_ST<-(1-ST_TO_TT-ST_TO_SS)
   
-  #Now caclculating offspring numbers from females of each genotype...
+  #Now calculating offspring numbers from females of each genotype...
   OFFSPRING_OF_SS<-rmultinom(1,NUMBERS_FEMALE[3]*2,c(SS_TO_SS,SS_TO_ST))
   OFFSPRING_OF_TT<-rmultinom(1,NUMBERS_FEMALE[1]*2,c(TT_TO_ST,TT_TO_TT))
   OFFSPRING_OF_ST<-rmultinom(1,NUMBERS_FEMALE[2]*2,c(ST_TO_TT,ST_TO_ST,ST_TO_SS))
