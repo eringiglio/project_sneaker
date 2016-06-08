@@ -16,7 +16,7 @@ for (j in 1:ITERATIONS){
   
   #Set initial parameter values for the allele and sex frequencies: 
   POPULATION = 1000
-  ALLELETERR = 0.5
+  ALLELETERR = 0.999
   ALLELESNEAK = 1-ALLELETERR
   SEXRATIOF = 0.5
   SEXRATIOM = 1-SEXRATIOF
@@ -99,7 +99,7 @@ for (j in 1:ITERATIONS){
     FREQ_S<-(2*TOTAL_SS + TOTAL_ST) / (POPULATION*2)
     
     #Calculating our numbers of males and females for the next gen...
-    SEXRATIOF=rbeta(1,11,11)
+    SEXRATIOF=rbeta(1,150,150)
     SEXRATIOM = 1-SEXRATIOF
     NUMBERS_FEMALE<-c(ceiling(SEXRATIOF*TOTAL_TT),ceiling(SEXRATIOF*TOTAL_ST),ceiling(SEXRATIOF*TOTAL_SS))
     NUMBERS_MALE<-c(floor(SEXRATIOM*TOTAL_TT),floor(SEXRATIOM*TOTAL_ST),floor(SEXRATIOM*TOTAL_SS))
@@ -135,6 +135,6 @@ points(cbind(X,DATA_S))
 }
 
 sum(DATA_EXTINCTION=='YES')
-sum(DATA_FIXED=='NO')
+sum(DATA_FIXED=='N')
 #Returns runtime at the end
 proc.time()-a
