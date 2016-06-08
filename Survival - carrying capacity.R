@@ -2,7 +2,7 @@
 #Set an initial resource level
 K <- 1000
 # Lambda is growth rate defined as (N(t)/N(t-1))-1
-LAMBDA<-0.3
+LAMBDA<-1.9
 #N is the initial population
 N = 1000
 

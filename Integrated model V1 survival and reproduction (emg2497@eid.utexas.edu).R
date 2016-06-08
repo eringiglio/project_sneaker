@@ -3,15 +3,18 @@
 
 #Set initial parameter values for the allele and sex frequencies: 
 POPULATION = 1000
-ALLELETERR = 0.5
-ALLELESNEAK = 0.5
+ALLELETERR = 0.2
+ALLELESNEAK = 0.6
 SEXRATIOF = 0.5
 SEXRATIOM = 1-SEXRATIOF
-MALE_TERR_SURVIVAL = 0.3
-MALE_SNEAK_SURVIVAL= 0.4
-FEMALE_SURVIVAL = 1
-MALE_TERR_SUCCESS = 0.7
-MALE_SNEAK_SUCCESS = 0.1
+MALE_TERR_SUCCESS = 0.8
+MALE_SNEAK_SUCCESS = 0.4
+
+#Ecological survival parameters based on K1 and K2
+K1_mean = 375
+K1_STD = 100
+K2_mean = 625
+K2_STD = 150
 
 #Get number of individuals for each sex and genotype
 #Use a for loop through number of individuals plus if statement
@@ -23,6 +26,10 @@ DATA_MALE<-NULL
 DATA_FEMALE<-NULL
 DATA_S<-NULL
 DATA_T<-NULL
+DATA_POPULATION<-NULL
+DATA_K1<-NULL
+DATA_K2<-NULL
+
 
 for (i in 1:1000){
   
@@ -32,16 +39,21 @@ for (i in 1:1000){
   #Here's the first place where our code changes. Now we want to first find out what proportion of male
   #even survive to breed in the first place, plus payouts for males that do survive. 
   #So how do we want to model this? 
+
+  #Creating these things for the sake of convenience
+  TOTAL_FEMALE<-sum(NUMBERS_FEMALE)
+  TOTAL_TERR<-sum(NUMBERS_MALE[1:2])
+  TOTAL_SNEAK<-NUMBERS_MALE[3]
+  #Do survival. FEMSNEAK is ALL the females and sneakers--lumped together--not sneaker females
+  K1<-rnorm(1,K1_mean,K1_STD)
+  K2<-rnorm(1,K2_mean,K2_STD)
+  NUMBERS_MALE[1:2]<-rmultinom(1,min(K1,TOTAL_TERR),c(NUMBERS_MALE[1]/TOTAL_TERR,NUMBERS_MALE[2]/TOTAL_TERR))
+  NUMBERS_FEMSNEAK<-rmultinom(1,min(K2,TOTAL_SNEAK+TOTAL_FEMALE),c((TOTAL_SNEAK/(TOTAL_FEMALE+TOTAL_SNEAK)),(NUMBERS_FEMALE[1]/(TOTAL_FEMALE+TOTAL_SNEAK)),(NUMBERS_FEMALE[2]/(TOTAL_FEMALE+TOTAL_SNEAK)),(NUMBERS_FEMALE[3]/(TOTAL_FEMALE+TOTAL_SNEAK))))
+  NUMBERS_MALE[3]<-NUMBERS_FEMSNEAK[1]
+  NUMBERS_FEMALE<-NUMBERS_FEMSNEAK[2:4]
   
-  #First we need to account for male phenotype as being separate from genotype.... or do we? 
-  #No, we can just lump NUMBERS_MALE numbers. Okay. So now we want to incorporate male survival before reproduction.
-  NUMBERS_MALE[1]<-NUMBERS_MALE[1]*MALE_TERR_SURVIVAL
-  NUMBERS_MALE[2]<-NUMBERS_MALE[2]*MALE_TERR_SURVIVAL
-  NUMBERS_MALE[3]<-NUMBERS_MALE[3]*MALE_SNEAK_SURVIVAL
   #Now we look at females. Each female has a different likelihood of meeting with males of different strategies.
   #So here, we're working in the mating success with females that males of each strategy has.
-  #Okay. So let's say that here, 80% of 
- 
   SS_TO_SS<-(MALE_SNEAK_SUCCESS*NUMBERS_MALE[3]/sum(NUMBERS_MALE))+(MALE_TERR_SUCCESS*0.5*NUMBERS_MALE[2]/sum(NUMBERS_MALE))
   SS_TO_ST<-(MALE_TERR_SUCCESS*NUMBERS_MALE[1]/sum(NUMBERS_MALE))+(MALE_TERR_SUCCESS*0.5*NUMBERS_MALE[2]/sum(NUMBERS_MALE))
   TT_TO_TT<-(MALE_TERR_SUCCESS*NUMBERS_MALE[1]/sum(NUMBERS_MALE))+(MALE_TERR_SUCCESS*0.5*NUMBERS_MALE[2]/sum(NUMBERS_MALE))
@@ -64,14 +76,27 @@ for (i in 1:1000){
   FREQ_S<-(2*TOTAL_SS + TOTAL_ST) / (POPULATION*2)
   
   #Calculating our numbers of males and females for the next gen...
-  NUMBERS_FEMALE<-c(ceiling(0.5*TOTAL_TT),ceiling(0.5*TOTAL_ST),ceiling(0.5*TOTAL_SS))
-  NUMBERS_MALE<-c(floor(0.5*TOTAL_TT),floor(0.5*TOTAL_ST),floor(0.5*TOTAL_SS))
+  SEXRATIOF=rbeta(1,11,11)
+  SEXRATIOM = 1-SEXRATIOF
+  NUMBERS_FEMALE<-c(ceiling(SEXRATIOF*TOTAL_TT),ceiling(SEXRATIOF*TOTAL_ST),ceiling(SEXRATIOF*TOTAL_SS))
+  NUMBERS_MALE<-c(floor(SEXRATIOM*TOTAL_TT),floor(SEXRATIOM*TOTAL_ST),floor(SEXRATIOM*TOTAL_SS))
   DATA_MALE<-rbind(DATA_MALE,NUMBERS_MALE)
   DATA_FEMALE<-rbind(DATA_FEMALE,NUMBERS_FEMALE)
   DATA_S<-c(DATA_S,FREQ_S)
   DATA_T<-c(DATA_T,FREQ_T)
+  DATA_POPULATION<-c(DATA_POPULATION,POPULATION)
+  DATA_K1<-c(DATA_K1,K1)
+  DATA_K2<-c(DATA_K2,K2)
 }
 
 X<-seq(1000)
+#par(mfrow=c(3,1))
 plot(cbind(X,DATA_T),ylim=c(0,1),col='red')
 points(cbind(X,DATA_S))
+plot.ts(DATA_POPULATION)
+plot.ts(DATA_MALE[,3])
+
+#Time to spit out the record-keeping numbers for each run:
+if (DATA_POPULATION[1000]==0){
+  EXTINCTION="YES"
+} else {EXTINCTION="NO"}
