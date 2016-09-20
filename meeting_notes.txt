@@ -1,0 +1,19 @@
+9/20/16
+	discussion of model parameters
+	how do we more closely model differential mating success?
+	how do the two allele success rates change with allele frequency? 
+	how do the two strategies interact?
+	
+	takeaway: sperm competition, in cases where one female mates with both territorial male and sneaker, is important 
+		in that case, who fathers more of her offspring? Say each female has 4 offspring, 2 of which die--who "wins" the mating? 
+		note: sneakers tend to have HUGE testicles....
+	
+	takeaway: harem size is important. 
+		if average harem size is LARGER than optimal size:
+			male doesn't have enough cognitive/energetic resources to 100% guard all females
+			sneaker males can successfully steal matings
+		if average harem size is SMALLER than optimal size:	
+			probably because too many territorial males in population
+			territorial males must compete against each other for limited territory/female attention
+			territorial males' biggest competitor: each other. sneakers therefore lower priority, make out like bandits bc not being watched
+			
