@@ -1,3 +1,23 @@
+10/4/16
+	So what is optimal harem size? That's our question.
+	Possibility: optimal harem size as a function of females? Kdom/Kf? 
+	More likely: some optimal harem size that dominant males can 100% defend from sneakers.
+	IF number of females in harems is less than all females:
+		sneakers target females who are not guarded
+		dom males get away with all matings of females in their harem
+	ELSE:
+		each sneaker male has SOME chance of success mating with a female
+		dom males get rest of matings 
+	Sneaker success chance depends on distance from ideal harem size: 
+	DISTANCE FROM IDEAL HAREM SIZE FUNCTION: 
+		lim f(H) as H goes to 0 = S/D+S
+		lim f(H) as H goes to I = some tiny probability P 
+			H = harem size				D = # dom males
+			I = ideal harem size 		S = # sneak males
+
+
+
+
 9/20/16
 	discussion of model parameters
 	how do we more closely model differential mating success?
