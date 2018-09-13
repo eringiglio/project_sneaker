@@ -47,8 +47,7 @@ for (j in 1:ITERATIONS){
     #New generation
     #Probabilities for different genotypes of offpring
     
-    #Here's the first place where our code changes. Now we want to first find out what proportion of male
-    #even survive to breed in the first place, plus payouts for males that do survive. 
+    #Here's the first place where our code changes. Now we want to first find out what proportion of males even survive to breed in the first place, plus payouts for males that do survive. 
     #So how do we want to model this? 
     
     #Creating these things for the sake of convenience
@@ -79,7 +78,7 @@ for (j in 1:ITERATIONS){
     #NUMBER_MALE_TT_MATING<-ceiling(NUMBERS_MALE[1]*MALE_TERR_SUCCESS)
     #NUMBER_MALE_ST_MATING<-ceiling(NUMBERS_MALE[2]*MALE_TERR_SUCCESS)
     #TOTAL_MALE_MATING<-NUMBER_MALE_SS_MATING+NUMBER_MALE_ST_MATING+NUMBER_MALE_TT_MATING
-    #Now get probability of each offsping genotype for each female genotype
+    #Now get probability of each offspring genotype for each female genotype
     #SS_TO_SS<-(NUMBER_MALE_SS_MATING/TOTAL_MALE_MATING)+(0.5*NUMBER_MALE_ST_MATING/TOTAL_MALE_MATING)
     #SS_TO_ST<-(NUMBER_MALE_TT_MATING/TOTAL_MALE_MATING)+(0.5*NUMBER_MALE_ST_MATING/TOTAL_MALE_MATING)
     #TT_TO_TT<-(NUMBER_MALE_TT_MATING/TOTAL_MALE_MATING)+(0.5*NUMBER_MALE_ST_MATING/TOTAL_MALE_MATING)
@@ -100,7 +99,7 @@ for (j in 1:ITERATIONS){
     NUMBER_MATINGS_ST<-NUMBER_MATINGS_TERR[2]
     NUMBER_MATINGS_SS<-TOTAL_FEMALE-sum(NUMBER_MATINGS_TERR)
     
-    #Now get probability of each offsping genotype for each female genotype
+    #Now get probability of each offspring genotype for each female genotype
     SS_TO_SS<-(NUMBER_MATINGS_SS/TOTAL_FEMALE)+(0.5*NUMBER_MATINGS_ST/TOTAL_FEMALE)
     SS_TO_ST<-(NUMBER_MATINGS_TT/TOTAL_FEMALE)+(0.5*NUMBER_MATINGS_ST/TOTAL_FEMALE)
     TT_TO_TT<-(NUMBER_MATINGS_TT/TOTAL_FEMALE)+(0.5*NUMBER_MATINGS_ST/TOTAL_FEMALE)
